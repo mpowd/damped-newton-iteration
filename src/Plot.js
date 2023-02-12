@@ -9,9 +9,11 @@ export default function Plot() {
   const [startPoint, setStartPoint] = useState(0)
   const [newExpression, setNewExpression] = useState(expression)
   const [newInterval, setNewInterval] = useState(interval)
-  const [xCurrent, setNewXCurrent] = useState((-2.5))
-  const [lambda, setNewLambda] = useState(1)
+  const [xCurrent, setXCurrent] = useState("")
   const [i, setNewI] = useState(0)
+  const [eps, setEps] = useState("")
+  const [maxI, setMaxI] = useState(20)
+  const [epsConditionIsFulfilled, setEpsConditionIsFulfilled] = useState(false)
 
   const expressionClick = () => {
     setNewExpression(expression)
@@ -27,48 +29,85 @@ export default function Plot() {
     setInterval(event.target.value.split(","))
   }
   const startPointClick = () => {
-    setStartPoint(startPoint)
-    setNewXCurrent(startPoint)
+    //setStartPoint(startPoint)
+    //setXCurrent(startPoint)
   }
   const startPointChange = event => {
-    setStartPoint(event.target.value)
-    setNewXCurrent(startPoint)
+    //setStartPoint(event.target.value)
+    //setNewXCurrent(startPoint)
+    setXCurrent(event.target.value)
+    console.log("xcurrent: " + event.target.value)
+    setNewI(0)
   }
+
+  const epsChange = event => {
+    setEps(event.target.value)
+    console.log("eps: 10^(-" + event.target.value * 1 + ")")
+  }
+
+  const maxIChange = event => {
+    setMaxI(event.target.value * 1)
+  }
+
+  const reset = () => {
+    setXCurrent("")
+    setEps("")
+    setNewI(0)
+
+  }
+
   const newtonIteration = () => {
-    console.log("x_" + i + " = " + xCurrent)
+    console.log("")
+    console.log("")
+    console.log("")
+    console.log("")
+    console.log("")
+    console.log(i + ". Iteration:")
+    if(terminationConditionFulfilled()) {
+      console.log()
+      console.log("Abbruchbedingung wurde erfüllt")
+      console.log("Totaler Approximationsfehler: " + Math.abs(evaluateExpression(expression, xCurrent*1)))
+      console.log()
+      return
+    }
+    console.log("x_" + i + " = " + xCurrent*1)
     setNewI(i + 1)
-    console.log(expression)
-    console.log(xCurrent)
-    let x = xCurrent
+    let x = xCurrent*1
     //let f = eval(expression)
     //let f_ = eval(math.derivative(expression, 'x').toString())
-    let f = evaluateExpression(expression, xCurrent)
-    let f_ = evaluateExpression(math.derivative(expression, 'x').toString(), xCurrent)
+    let f = evaluateExpression(expression, xCurrent*1)
+    let f_ = evaluateExpression(math.derivative(expression, 'x').toString(), xCurrent*1)
     console.log("f(x) = " + f)
     console.log("f'(x) = " + f_)
     let s_i = - (f / f_)
     console.log("s_i = " + s_i)
     //alert(evaluated_derivative)
-    //let lambda = chooseLambda(s_i)
-    let lambda = 1
+    let lambda = chooseLambda(s_i)
+    console.log("Dämpfungsfaktor: " + lambda)
     //let x_next = xCurrent - evaluated_expression / evaluated_derivative
-    let x_next = xCurrent + s_i
-    setNewXCurrent(x_next.toString() * 1)
+    let x_next = xCurrent*1 + lambda * s_i
+    setXCurrent(x_next.toString())
     
   }
 
+  function terminationConditionFulfilled() {
+    return (Math.abs(evaluateExpression(expression, xCurrent*1)) < (10**(-eps*1)) || i > maxI)
+    /* if (evaluateExpression(expression, xCurrent) < eps) {
+      setEpsConditionIsFulfilled(true)
+    } */
+  }
 
-  function chooseLambda(s_i){
+  function chooseLambda(s_i) {
     let lambda = 1
     let i = 0
     while(true){
-      if(Math.pow(evaluateExpression(expression, xCurrent + lambda * s_i), 2) < Math.pow(evaluateExpression(expression, xCurrent), 2)) {
-        console.log("Choosen lambda = " + lambda)
+      if(Math.pow(evaluateExpression(expression, xCurrent*1 + lambda * s_i), 2) < Math.pow(evaluateExpression(expression, xCurrent*1), 2)) {
         return lambda
       } else {
         lambda = lambda / 2
       }
-      if(i >= 10){
+      if(i >= 1000){
+        console.log("Else Fall Lambda: " + lambda)
         return lambda
       }
     }
@@ -79,7 +118,9 @@ export default function Plot() {
   }
 
   useEffect(() => {
-    setNewXCurrent(xCurrent)
+    if(expression != "") {
+      
+    }
     functionPlot({
       target: '#plot',
       data: [{
@@ -91,7 +132,7 @@ export default function Plot() {
         graphType: 'polyline'
       }, {
         points: [
-          [xCurrent, 0],
+          [xCurrent*1, 0],
           /* [newInterval[0], 0],
           [newInterval[0], 0.1],
           [newInterval[0], -0.1],
@@ -124,12 +165,26 @@ export default function Plot() {
           value = {interval} />
     </div> */}
     <div>
-      <input onChange = {startPointChange}
-          value = {startPoint} />
-      <button onClick = {startPointClick}>Setze Startpunkt</button>
+      <p>
+        Abbruchbedingungen:
+        <br></br>
+        <br></br>
+        eps: <input onChange = {epsChange} value = {eps} />
+        <br></br>
+        <br></br>
+        max. Iterationszahl: <input onChange = {maxIChange} value = {maxI} />
+        <br></br>
+        <br></br>
+        x: <input onChange = {startPointChange} value = {xCurrent} />
+      </p>
+{/*       <button onClick = {startPointClick}>Setze Startstelle</button>
+ */}    </div>
+    <div>
+      <button onClick = {newtonIteration}>Einzelne Newton Iteration</button>
     </div>
     <div>
-      <button onClick = {newtonIteration}>Newton Iteration</button>
+      <br></br>
+      <button onClick = {reset}>eps und x zurücksetzen</button>
     </div>
     </>
   )
