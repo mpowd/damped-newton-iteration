@@ -2,20 +2,21 @@ import React, { useEffect, useState } from 'react'
 import functionPlot from 'function-plot'
 var math = require('mathjs')
 
+//(x-1/6x^3+1/120x^5 + 1)/x^3*(x-1)
+//x-1/6x^3+1/120x^5
+
 export default function Plot() {
 
-  const [expression, setExpression] = useState("x^2 - 2")
+  const [expression, setExpression] = useState("x-1/6x^3+1/120x^5 + 1")
   const [interval, setInterval] = useState([])
   const [startPoint, setStartPoint] = useState(0)
   const [newExpression, setNewExpression] = useState(expression)
-  const [newInterval, setNewInterval] = useState(interval)
   const [xCurrent, setXCurrent] = useState("")
   const [i, setNewI] = useState(0)
   const [eps, setEps] = useState("")
   const [maxI, setMaxI] = useState(20)
   const [conditionIsFulfilled, setConditionIsFulfilled] = useState(false)
-  let a = -100
-  let b = 100
+  const [tangent, setTangent] = useState("0")
   let tolerance = 3
   
 
@@ -24,13 +25,6 @@ export default function Plot() {
   }
   const expressionChange = event => {
     setExpression(event.target.value)
-  }
-  const intervalClick = () => {
-    setNewInterval(interval)
-    //setNewXCurrent(interval[0])
-  }
-  const intervalChange = event => {
-    setInterval(event.target.value.split(","))
   }
   const startPointClick = () => {
     //setStartPoint(startPoint)
@@ -57,7 +51,8 @@ export default function Plot() {
     setXCurrent("")
     setEps("")
     setNewI(0)
-
+    setInterval([])
+    setTangent("0")
   }
 
   const newtonIteration = () => {
@@ -79,11 +74,12 @@ export default function Plot() {
     let x = xCurrent*1
     //let f = eval(expression)
     //let f_ = eval(math.derivative(expression, 'x').toString())
-    let f = evaluateExpression(expression, xCurrent*1)
-    let f_ = evaluateExpression(math.derivative(expression, 'x').toString(), xCurrent*1)
-    console.log("f(x) = " + f)
-    console.log("f'(x) = " + f_)
-    let s_i = - (f / f_)
+    let fx = evaluateExpression(expression, xCurrent*1)
+    let f_x = evaluateExpression(math.derivative(expression, 'x').toString(), xCurrent*1)
+    setTangent(f_x.toString() + "*x+" + (fx).toString() + "-" + (f_x).toString() + "*" + xCurrent.toString())
+    console.log("f(x) = " + fx)
+    console.log("f'(x) = " + f_x)
+    let s_i = - (fx / f_x)
     console.log("s_i = " + s_i)
     //alert(evaluated_derivative)
     let lambda = chooseLambda(s_i)
@@ -91,6 +87,7 @@ export default function Plot() {
     //let x_next = xCurrent - evaluated_expression / evaluated_derivative
     let x_next = xCurrent*1 + lambda * s_i
     setXCurrent(x_next.toString())
+    console.log(f_x.toString() + "*x+" + (fx - f_x).toString() + "*x")
   }
 
   function terminationConditionFulfilled() {
@@ -143,46 +140,69 @@ export default function Plot() {
           updateOnMouseMove: true
         },
         graphType: 'polyline'
-      }, {
+      },{
+        fn: tangent
+      },{
         points: [
           [xCurrent*1, 0],
-          /* [newInterval[0], 0],
-          [newInterval[0], 0.1],
-          [newInterval[0], -0.1],
-          [newInterval[1], 0],
-          [newInterval[1], 0.1],
-          [newInterval[1], -0.1] */
+          [interval[0], 0],
+          [interval[0], 0.1],
+          [interval[0], -0.1],
+          [interval[0], 0.2],
+          [interval[0], -0.2],
+          [interval[1], 0],
+          [interval[1], 0.1],
+          [interval[1], -0.1],
+          [interval[1], 0.2],
+          [interval[1], -0.2]
           //[startPoint, 0]
         ],
         fnType: 'points',
         graphType: 'scatter'
       }],
     })
-  }, [newExpression, xCurrent])
+  }, [newExpression, xCurrent, interval])
 
   const calcInterval = () => {
-    calculateInterval(-100, 100, false)
+    calculateInterval(-100, 100)
   }
 
 
-  function calculateInterval(a , b, found) {
+  function calculateInterval(a , b) {
 
-    if((b - a) < tolerance) {
-      if(found) {
-        console.log("Intervall gefunden: " + a + ", " + b)
-        setXCurrent((a + b) / 2)
-      }
-      return
+    if(evaluateExpression(expression, a) == 0) {
+      console.log("Nullstelle gefunden: " + a)
+      setXCurrent(a)
+      return a
+    }
+    if(evaluateExpression(expression, b) == 0) {
+      console.log("Nullstelle gefunden: " + b)
+      setXCurrent(b)
+      return b
     }
 
     let bothSameSign = (evaluateExpression(expression, a) > 0 && evaluateExpression(expression, b) > 0)
                      ||(evaluateExpression(expression, a) < 0 && evaluateExpression(expression, b) < 0)
 
-    if(!bothSameSign) {
-      calculateInterval(a, (a+b)/2, true)
-    }else {
-      calculateInterval((a+b)/2, b, false)
+    if((b - a) < tolerance) {
+      if(!bothSameSign) {
+        console.log("Intervall gefunden: " + a + ", " + b)
+        setXCurrent((a + b) / 2)
+        setInterval([a, b])
+        return
+      }
+      return
     }
+    calculateInterval(a, (a+b)/2)
+    calculateInterval((a+b)/2, b)
+
+    /* if(!bothSameSign) {
+      calculateInterval(a, (a+b)/2)
+      calculateInterval((a+b)/2, b)
+    }else {
+      calculateInterval(a, (a+b)/2)
+      calculateInterval((a+b)/2, b)
+    } */
   }
 
 
@@ -201,15 +221,6 @@ export default function Plot() {
     </div> */}
     <div>
       <p>
-        Abbruchbedingungen:
-        <br></br>
-        <br></br>
-        eps: <input onChange = {epsChange} value = {eps} />
-        <br></br>
-        <br></br>
-        max. Iterationsanzahl: <input onChange = {maxIChange} value = {maxI} />
-        <br></br>
-        <br></br>
         x: <input onChange = {startPointChange} value = {xCurrent} />
         <br></br>
         <br></br>
@@ -224,8 +235,20 @@ export default function Plot() {
     </div>
     <div>
       <br></br>
-      <button onClick = {reset}>eps und x zurücksetzen</button>
+      <button onClick = {reset}>Zurücksetzen</button>
     </div>
+    <p>
+      <br></br>
+      <br></br>
+      <br></br>
+      Abbruchbedingungen:
+      <br></br>
+      <br></br>
+      eps: <input onChange = {epsChange} value = {eps} />
+      <br></br>
+      <br></br>
+      max. Iterationsanzahl: <input onChange = {maxIChange} value = {maxI} />
+    </p>
     </>
   )
 }
