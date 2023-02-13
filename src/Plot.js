@@ -13,7 +13,11 @@ export default function Plot() {
   const [i, setNewI] = useState(0)
   const [eps, setEps] = useState("")
   const [maxI, setMaxI] = useState(20)
-  const [epsConditionIsFulfilled, setEpsConditionIsFulfilled] = useState(false)
+  const [conditionIsFulfilled, setConditionIsFulfilled] = useState(false)
+  let a = -100
+  let b = 100
+  let tolerance = 3
+  
 
   const expressionClick = () => {
     setNewExpression(expression)
@@ -87,11 +91,15 @@ export default function Plot() {
     //let x_next = xCurrent - evaluated_expression / evaluated_derivative
     let x_next = xCurrent*1 + lambda * s_i
     setXCurrent(x_next.toString())
-    
   }
 
   function terminationConditionFulfilled() {
-    return (Math.abs(evaluateExpression(expression, xCurrent*1)) < (10**(-eps*1)) || i > maxI)
+    let fulfilled = (Math.abs(evaluateExpression(expression, xCurrent*1)) < (10**(-eps*1)) || i > maxI)
+    if(fulfilled) {
+      setConditionIsFulfilled(true)
+      return true
+    }
+    return false
     /* if (evaluateExpression(expression, xCurrent) < eps) {
       setEpsConditionIsFulfilled(true)
     } */
@@ -118,9 +126,14 @@ export default function Plot() {
   }
 
   useEffect(() => {
-    if(expression != "") {
-      
-    }
+
+    let contentsBounds = document.body.getBoundingClientRect();
+    let width = 800;
+    let height = 500;
+    let ratio = contentsBounds.width / width;
+    width *= ratio;
+    height *= ratio;
+
     functionPlot({
       target: '#plot',
       data: [{
@@ -147,9 +160,31 @@ export default function Plot() {
     })
   }, [newExpression, xCurrent])
 
-  function calculateInterval() {
-
+  const calcInterval = () => {
+    calculateInterval(-100, 100, false)
   }
+
+
+  function calculateInterval(a , b, found) {
+
+    if((b - a) < tolerance) {
+      if(found) {
+        console.log("Intervall gefunden: " + a + ", " + b)
+        setXCurrent((a + b) / 2)
+      }
+      return
+    }
+
+    let bothSameSign = (evaluateExpression(expression, a) > 0 && evaluateExpression(expression, b) > 0)
+                     ||(evaluateExpression(expression, a) < 0 && evaluateExpression(expression, b) < 0)
+
+    if(!bothSameSign) {
+      calculateInterval(a, (a+b)/2, true)
+    }else {
+      calculateInterval((a+b)/2, b, false)
+    }
+  }
+
 
   return (
     <>
@@ -172,15 +207,20 @@ export default function Plot() {
         eps: <input onChange = {epsChange} value = {eps} />
         <br></br>
         <br></br>
-        max. Iterationszahl: <input onChange = {maxIChange} value = {maxI} />
+        max. Iterationsanzahl: <input onChange = {maxIChange} value = {maxI} />
         <br></br>
         <br></br>
         x: <input onChange = {startPointChange} value = {xCurrent} />
+        <br></br>
+        <br></br>
+        <button onClick = {calcInterval}>Berechne Intervall</button>
       </p>
 {/*       <button onClick = {startPointClick}>Setze Startstelle</button>
  */}    </div>
     <div>
-      <button onClick = {newtonIteration}>Einzelne Newton Iteration</button>
+      <br></br>
+      <br></br>
+      <button onClick = {newtonIteration}>Newton Iteration</button>
     </div>
     <div>
       <br></br>
