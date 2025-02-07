@@ -1,70 +1,66 @@
-# Getting Started with Create React App
+# Damped Newton Method Visualizer
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React application for visualizing the Newton-Raphson method with damping, enabling interactive root-finding and parameter exploration.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Interactive Graph**
+  Utilizes `function-plot` to dynamically render the function, its derivative, and tangent lines.
 
-### `npm start`
+- **Newton Iteration**
+  Provides step-by-step execution of the damped Newton method for precise root approximation.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Customizable Parameters**
+  - Function expression input
+  - Configurable starting point
+  - Adjustable error tolerance (`eps`)
+  - Controllable maximum iterations (`max iterations`)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Interval Calculation**
+  Automatically determines an optimal interval for root approximation.
 
-### `npm test`
+- **Reset Functionality**
+  Easily clear inputs and reset the visualization state.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Prerequisites
 
-### `npm run build`
+- Node.js
+- npm
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Installation
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/mpowd/damped-newton-iteration.git
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. Navigate to project directory:
+   ```sh
+   cd damped-newton-iteration
+   ```
 
-### `npm run eject`
+3. Install dependencies:
+   ```sh
+   npm install
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+4. Start development server:
+   ```sh
+   npm start
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Usage
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+1. Enter a function (e.g., `x - 1/6*x^3 + 1/120*x^5 + 1`)
+2. Click "Update Graph" to visualize the mathematical function
+3. Set initial root guess
+4. Use "Calculate Interval" to find valid range 
+5. Execute "Newton Iteration" step-by-step
+6. Adjust `eps` and max iterations as needed
+7. Reset inputs anytime
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Dependencies
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- React
+- function-plot
+- mathjs
