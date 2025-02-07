@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react'
 import functionPlot from 'function-plot'
 var math = require('mathjs')
 
-//(x-1/6x^3+1/120x^5 + 1)/x^3*(x-1)
-//x-1/6x^3+1/120x^5
+
 
 export default function Plot() {
 
@@ -26,13 +25,7 @@ export default function Plot() {
   const expressionChange = event => {
     setExpression(event.target.value)
   }
-  const startPointClick = () => {
-    //setStartPoint(startPoint)
-    //setXCurrent(startPoint)
-  }
   const startPointChange = event => {
-    //setStartPoint(event.target.value)
-    //setNewXCurrent(startPoint)
     setXCurrent(event.target.value)
     console.log("xcurrent: " + event.target.value)
     setNewI(0)
@@ -61,19 +54,17 @@ export default function Plot() {
     console.log("")
     console.log("")
     console.log("")
-    console.log(i + ". Iteration:")
+    console.log(i + ". iteration:")
     if(terminationConditionFulfilled()) {
       console.log()
-      console.log("Abbruchbedingung wurde erfüllt")
-      console.log("Totaler Approximationsfehler: " + Math.abs(evaluateExpression(expression, xCurrent*1)))
+      console.log("Termination condition has been met.")
+      console.log("Total approximation error: " + Math.abs(evaluateExpression(expression, xCurrent*1)))
       console.log()
       return
     }
     console.log("x_" + i + " = " + xCurrent*1)
     setNewI(i + 1)
     let x = xCurrent*1
-    //let f = eval(expression)
-    //let f_ = eval(math.derivative(expression, 'x').toString())
     let fx = evaluateExpression(expression, xCurrent*1)
     let f_x = evaluateExpression(math.derivative(expression, 'x').toString(), xCurrent*1)
     setTangent(f_x.toString() + "*x+" + (fx).toString() + "-" + (f_x).toString() + "*" + xCurrent.toString())
@@ -81,10 +72,8 @@ export default function Plot() {
     console.log("f'(x) = " + f_x)
     let s_i = - (fx / f_x)
     console.log("s_i = " + s_i)
-    //alert(evaluated_derivative)
     let lambda = chooseLambda(s_i)
-    console.log("Dämpfungsfaktor: " + lambda)
-    //let x_next = xCurrent - evaluated_expression / evaluated_derivative
+    console.log("damping factor: " + lambda)
     let x_next = xCurrent*1 + lambda * s_i
     setXCurrent(x_next.toString())
     console.log(f_x.toString() + "*x+" + (fx - f_x).toString() + "*x")
@@ -97,9 +86,6 @@ export default function Plot() {
       return true
     }
     return false
-    /* if (evaluateExpression(expression, xCurrent) < eps) {
-      setEpsConditionIsFulfilled(true)
-    } */
   }
 
   function chooseLambda(s_i) {
@@ -155,7 +141,6 @@ export default function Plot() {
           [interval[1], -0.1],
           [interval[1], 0.2],
           [interval[1], -0.2]
-          //[startPoint, 0]
         ],
         fnType: 'points',
         graphType: 'scatter'
@@ -171,12 +156,12 @@ export default function Plot() {
   function calculateInterval(a , b) {
 
     if(evaluateExpression(expression, a) == 0) {
-      console.log("Nullstelle gefunden: " + a)
+      console.log("root found: " + a)
       setXCurrent(a)
       return a
     }
     if(evaluateExpression(expression, b) == 0) {
-      console.log("Nullstelle gefunden: " + b)
+      console.log("root found: " + b)
       setXCurrent(b)
       return b
     }
@@ -186,7 +171,7 @@ export default function Plot() {
 
     if((b - a) < tolerance) {
       if(!bothSameSign) {
-        console.log("Intervall gefunden: " + a + ", " + b)
+        console.log("interval found " + a + ", " + b)
         setXCurrent((a + b) / 2)
         setInterval([a, b])
         return
@@ -195,14 +180,6 @@ export default function Plot() {
     }
     calculateInterval(a, (a+b)/2)
     calculateInterval((a+b)/2, b)
-
-    /* if(!bothSameSign) {
-      calculateInterval(a, (a+b)/2)
-      calculateInterval((a+b)/2, b)
-    }else {
-      calculateInterval(a, (a+b)/2)
-      calculateInterval((a+b)/2, b)
-    } */
   }
 
 
@@ -211,23 +188,17 @@ export default function Plot() {
     <div>
       <input onChange = {expressionChange}
           value = {expression} />
-      <button onClick = {expressionClick}>Aktualisere Graph</button>
+      <button onClick = {expressionClick}>update graph</button>
     </div>
     <div id="plot"></div>
-    {/* <div>
-      <button onClick = {intervalClick}>Berechne Intervall</button>
-      <input onChange = {intervalChange}
-          value = {interval} />
-    </div> */}
     <div>
       <p>
         x: <input onChange = {startPointChange} value = {xCurrent} />
         <br></br>
         <br></br>
-        <button onClick = {calcInterval}>Berechne Intervall</button>
+        <button onClick = {calcInterval}>Calculate Interval</button>
       </p>
-{/*       <button onClick = {startPointClick}>Setze Startstelle</button>
- */}    </div>
+    </div>
     <div>
       <br></br>
       <br></br>
@@ -235,19 +206,19 @@ export default function Plot() {
     </div>
     <div>
       <br></br>
-      <button onClick = {reset}>Zurücksetzen</button>
+      <button onClick = {reset}>Reset</button>
     </div>
     <p>
       <br></br>
       <br></br>
       <br></br>
-      Abbruchbedingungen:
+      termination conditions:
       <br></br>
       <br></br>
       eps: <input onChange = {epsChange} value = {eps} />
       <br></br>
       <br></br>
-      max. Iterationsanzahl: <input onChange = {maxIChange} value = {maxI} />
+      max iterations: <input onChange = {maxIChange} value = {maxI} />
     </p>
     </>
   )

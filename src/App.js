@@ -1,12 +1,12 @@
 import React, { useState} from 'react';
-import TodoList from './TodoList';
+import Plot from './Plot';
 
 
 function App() {
 
   return (
     <>
-    <TodoList/>
+    <Plot/>
     </>
     
   )
